@@ -72,6 +72,8 @@ public class LanguageTestAutomate {
 //        MobileElement el1 = (MobileElement) driver.findElementByAccessibilityId("Wysa");
 //        el1.click();
 //        driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+//        MobileElement el21 = (MobileElement) driver.findElementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView[2]");
+//        el21.click();
     }
 
     @Test(enabled = true)

@@ -78,7 +78,6 @@ public class LanguageTestAutomate {
     public void myFirstTest() throws InterruptedException {
 
         for (int i=0;i<inputData.size();i++){
-            //System.out.println(inputData.get(i));
             List<String> outputData = new ArrayList<>();;
             driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
             MobileElement el2 = (MobileElement) driver.findElementByXPath("//android.widget.LinearLayout[@content-desc=\"Talk\"]/android.widget.ImageView");

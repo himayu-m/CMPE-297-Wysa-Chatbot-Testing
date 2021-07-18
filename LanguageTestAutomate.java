@@ -87,7 +87,7 @@ public class LanguageTestAutomate {
             el3.sendKeys(inputData.get(i));
             MobileElement el4 = (MobileElement) driver.findElementByAccessibilityId("Send");
             el4.click();
-            java.util.concurrent.TimeUnit.SECONDS.sleep(20);
+            java.util.concurrent.TimeUnit.SECONDS.sleep(15);
             List<MobileElement> text1 = driver.findElements(By.className("android.widget.TextView"));
             for(MobileElement ele : text1) {
                 outputData.add(ele.getText());

@@ -23,7 +23,7 @@ public class LanguageTestAutomate {
 
     public static URL url;
     public static DesiredCapabilities capabilities;
-    public static AndroidDriver<MobileElement> driver;
+    public static AndroidDriver<AndroidElement> driver;
     public String workingDir;
 
     Properties properties;
@@ -58,7 +58,7 @@ public class LanguageTestAutomate {
 
         readPropertyFile();
         System.out.println(inputData);
-        System.out.println(domainInput);
+        //System.out.println(domainInput);
         System.out.println(validationData);
 
         final String URL_STRING = "http://0.0.0.0:4723/wd/hub/";
@@ -67,7 +67,7 @@ public class LanguageTestAutomate {
         capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "emulator-5554");
         capabilities.setCapability("platformName", "android");
         capabilities.setCapability(MobileCapabilityType.NO_RESET, true);
-        driver = new AndroidDriver<MobileElement>(url, capabilities);
+        driver = new AndroidDriver<AndroidElement>(url, capabilities);
         driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 //        MobileElement el1 = (MobileElement) driver.findElementByAccessibilityId("Wysa");
 //        el1.click();
@@ -87,18 +87,20 @@ public class LanguageTestAutomate {
             el3.sendKeys(inputData.get(i));
             MobileElement el4 = (MobileElement) driver.findElementByAccessibilityId("Send");
             el4.click();
-            java.util.concurrent.TimeUnit.SECONDS.sleep(15);
-            List<MobileElement> text1 = driver.findElements(By.className("android.widget.TextView"));
+            java.util.concurrent.TimeUnit.SECONDS.sleep(17);
+            List<AndroidElement> text1 = driver.findElements(By.className("android.widget.TextView"));
             for(MobileElement ele : text1) {
                 outputData.add(ele.getText());
             }
             outputData.remove(0);
             outputData.remove(0);
             outputData.remove(0);
-            outputData.remove(outputData.size()-1);
+            System.out.println(i+1);
             System.out.println(outputData);
+            driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
             MobileElement el6 = (MobileElement) driver.findElementByAccessibilityId("Back button");
             el6.click();
+            driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
         }
     }
 }

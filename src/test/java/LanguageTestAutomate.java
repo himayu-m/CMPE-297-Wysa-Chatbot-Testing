@@ -22,7 +22,6 @@ public class LanguageTestAutomate {
     public static URL url;
     public static DesiredCapabilities capabilities;
     public static AndroidDriver<AndroidElement> driver;
-    public String workingDir;
 
     Properties properties;
     List<String> languageInput;
@@ -30,7 +29,7 @@ public class LanguageTestAutomate {
     public void readPropertyFile() {
 
         try {
-            InputStream inputStream = LanguageTestAutomate.class.getClassLoader().getResourceAsStream("inputData.properties");//new FileInputStream(workingDir + "\\src\\test\\resources\\inputData.properties");
+            InputStream inputStream = LanguageTestAutomate.class.getClassLoader().getResourceAsStream("inputData.properties");
             InputStreamReader isr = new InputStreamReader(inputStream, "UTF-8");
             properties = new Properties();
             properties.load(isr);

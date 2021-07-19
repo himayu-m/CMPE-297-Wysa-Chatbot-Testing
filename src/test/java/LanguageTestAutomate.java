@@ -88,12 +88,15 @@ public class LanguageTestAutomate {
 //        el21.click();
     }
 
-    @Test(enabled = true)
+    //@Test(enabled = true)
     public void myFirstTest() throws InterruptedException, IOException {
 
         for (int i = 0 ; i < languageInput.size() ; i++) {
+
             int caseID = i+1;
-            List<String> outputData = new ArrayList<>();;
+            int passed = 0;
+            List<String> outputData = new ArrayList<>();
+
             driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
             MobileElement el2 = (MobileElement) driver.findElementByXPath("//android.widget.LinearLayout[@content-desc=\"Talk\"]/android.widget.ImageView");
             el2.click();
@@ -104,17 +107,16 @@ public class LanguageTestAutomate {
             el4.click();
             TimeUnit.SECONDS.sleep(17);
             List<AndroidElement> text1 = driver.findElements(By.className("android.widget.TextView"));
+
             for(MobileElement ele : text1) {
                 outputData.add(ele.getText());
             }
+            outputData.remove(0);
+            outputData.remove(0);
+            outputData.remove(0);
 
-            outputData.remove(0);
-            outputData.remove(0);
-            outputData.remove(0);
             System.out.println("Testing Case "+ caseID+".1");
-            //System.out.println(outputData);
-
-            int passed = 0;
+            System.out.println(outputData);
 
             if(unrecValidation.contains(outputData.get(0))){
                 System.out.println("Acknowledge Problem: Failed");
@@ -131,7 +133,7 @@ public class LanguageTestAutomate {
             else{
                 System.out.println("Grammar and Semantics: Failed");
             }
-//
+
 //            if (keyword){
 //                System.out.println("Subject Recognized: Passed");
 //                passed+=1;

@@ -7,6 +7,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -16,15 +17,14 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-public class LanguageTestAutomate {
-
+public class DomainTestAutomate {
     public static URL url;
     public static DesiredCapabilities capabilities;
     public static AndroidDriver<AndroidElement> driver;
     public String workingDir;
 
     Properties properties;
-    List<String> languageInput;
+    List<String> domainInput;
     List<String> unrecValidation;
     public void readPropertyFile() {
 
@@ -33,8 +33,8 @@ public class LanguageTestAutomate {
             InputStream validationFile = LanguageTestAutomate.class.getClassLoader().getResourceAsStream("validation.properties");
             properties = new Properties();
             properties.load(inputFile);
-            String languageStr = properties.getProperty("language");
-            languageInput = Splitter.on(";").trimResults().splitToList(languageStr);
+            String domainStr = properties.getProperty("domain");
+            domainInput = Splitter.on(";").trimResults().splitToList(domainStr);
             properties = new Properties();
             properties.load(validationFile);
             String unrecognizedStr = properties.getProperty("unrecognized");
@@ -48,7 +48,7 @@ public class LanguageTestAutomate {
     public void setupAppium() throws MalformedURLException {
 
         readPropertyFile();
-        System.out.println(languageInput);
+        System.out.println(domainInput);
         System.out.println(unrecValidation);
 
         final String URL_STRING = "http://0.0.0.0:4723/wd/hub/";
@@ -69,7 +69,7 @@ public class LanguageTestAutomate {
     @Test(enabled = true)
     public void myFirstTest() throws InterruptedException {
 
-        for (int i = 0 ; i < languageInput.size() ; i++) {
+        for (int i = 0 ; i < domainInput.size() ; i++) {
             int caseID = i+1;
             List<String> outputData = new ArrayList<>();;
             driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
@@ -77,7 +77,7 @@ public class LanguageTestAutomate {
             el2.click();
             driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
             MobileElement el3 = (MobileElement) driver.findElementByAccessibilityId("Reply or say help…");
-            el3.sendKeys(languageInput.get(i));
+            el3.sendKeys(domainInput.get(i));
             MobileElement el4 = (MobileElement) driver.findElementByAccessibilityId("Send");
             el4.click();
             TimeUnit.SECONDS.sleep(17);
@@ -89,7 +89,7 @@ public class LanguageTestAutomate {
             outputData.remove(0);
             outputData.remove(0);
             outputData.remove(0);
-            System.out.println("Testing Case "+ caseID+".1");
+            System.out.println("Testing Case DK "+ caseID);
             //System.out.println(outputData);
 
             int passed = 0;
@@ -119,10 +119,10 @@ public class LanguageTestAutomate {
 //            }
 //
 //            if (passed==3){
-//                System.out.println("Test Case "+ caseID+".1: Passed");
+//                System.out.println("Test Case DK "+ caseID+": Passed");
 //            }
 //            else{
-//                System.out.println("Test Case "+ caseID+".1: Failed");
+//                System.out.println("Test Case DK "+ caseID+": Failed");
 //            }
 
             driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
@@ -132,3 +132,4 @@ public class LanguageTestAutomate {
         }
     }
 }
+

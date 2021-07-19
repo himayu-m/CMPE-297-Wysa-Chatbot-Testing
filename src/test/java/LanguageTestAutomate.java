@@ -28,7 +28,6 @@ public class LanguageTestAutomate {
     public static URL url;
     public static DesiredCapabilities capabilities;
     public static AndroidDriver<AndroidElement> driver;
-    public String workingDir;
 
     Properties properties;
     List<String> languageInput;

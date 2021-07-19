@@ -40,5 +40,10 @@
             <version>6.10</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.languagetool</groupId>
+            <artifactId>language-en</artifactId>
+            <version>5.4</version>
+        </dependency>
     </dependencies>
 </project>

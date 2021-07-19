@@ -9,12 +9,19 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+
+import org.languagetool.JLanguageTool;
+import org.languagetool.language.AmericanEnglish;
+import org.languagetool.rules.RuleMatch;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 
 public class LanguageTestAutomate {
 
@@ -26,17 +33,20 @@ public class LanguageTestAutomate {
     Properties properties;
     List<String> languageInput;
     List<String> unrecValidation;
+
     public void readPropertyFile() {
 
         try {
-            InputStream inputFile = LanguageTestAutomate.class.getClassLoader().getResourceAsStream("inputData.properties");//new FileInputStream(workingDir + "\\src\\test\\resources\\inputData.properties");
-            InputStream validationFile = LanguageTestAutomate.class.getClassLoader().getResourceAsStream("validation.properties");
+            InputStream inputStream = LanguageTestAutomate.class.getClassLoader().getResourceAsStream("inputData.properties");
+            InputStreamReader isr = new InputStreamReader(inputStream, "UTF-8");
             properties = new Properties();
-            properties.load(inputFile);
+            properties.load(isr);
             String languageStr = properties.getProperty("language");
             languageInput = Splitter.on(";").trimResults().splitToList(languageStr);
+            InputStream validationStream = LanguageTestAutomate.class.getClassLoader().getResourceAsStream("validation.properties");
+            InputStreamReader vsr = new InputStreamReader(validationStream, "UTF-8");
             properties = new Properties();
-            properties.load(validationFile);
+            properties.load(vsr);
             String unrecognizedStr = properties.getProperty("unrecognized");
             unrecValidation = Splitter.on(";").trimResults().splitToList(unrecognizedStr);
         } catch (IOException e) {
@@ -44,12 +54,24 @@ public class LanguageTestAutomate {
         }
     }
 
+    public Boolean grammarChecker(List<String> check) throws IOException{
+        JLanguageTool langTool = new JLanguageTool(new AmericanEnglish());
+        for(int i=0; i< check.size();i++){
+            List<RuleMatch> matches = langTool.check(check.get(i));
+            if (matches.size()>0) {
+                return FALSE;
+            }
+        }
+        return TRUE;
+    }
+
+
     @BeforeSuite
-    public void setupAppium() throws MalformedURLException {
+    public void setupAppium() throws MalformedURLException, IOException {
 
         readPropertyFile();
-        System.out.println(languageInput);
-        System.out.println(unrecValidation);
+//        System.out.println(languageInput);
+//        System.out.println(unrecValidation);
 
         final String URL_STRING = "http://0.0.0.0:4723/wd/hub/";
         url = new URL(URL_STRING);
@@ -59,6 +81,7 @@ public class LanguageTestAutomate {
         capabilities.setCapability(MobileCapabilityType.NO_RESET, true);
         driver = new AndroidDriver<AndroidElement>(url, capabilities);
         driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
+
 //        MobileElement el1 = (MobileElement) driver.findElementByAccessibilityId("Wysa");
 //        el1.click();
 //        driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
@@ -67,7 +90,7 @@ public class LanguageTestAutomate {
     }
 
     @Test(enabled = true)
-    public void myFirstTest() throws InterruptedException {
+    public void myFirstTest() throws InterruptedException, IOException {
 
         for (int i = 0 ; i < languageInput.size() ; i++) {
             int caseID = i+1;
@@ -102,13 +125,13 @@ public class LanguageTestAutomate {
                 passed += 1;
             }
 
-//            if (grammarCheck){
-//                System.out.println("Grammar and Semantics: Passed");
-//                passed += 1;
-//            }
-//            else{
-//                System.out.println("Grammar and Semantics: Failed");
-//            }
+            if (grammarChecker(outputData)){
+                System.out.println("Grammar and Semantics: Passed");
+                passed += 1;
+            }
+            else{
+                System.out.println("Grammar and Semantics: Failed");
+            }
 //
 //            if (keyword){
 //                System.out.println("Subject Recognized: Passed");

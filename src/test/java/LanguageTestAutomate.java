@@ -9,6 +9,7 @@ import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -29,14 +30,16 @@ public class LanguageTestAutomate {
     public void readPropertyFile() {
 
         try {
-            InputStream inputFile = LanguageTestAutomate.class.getClassLoader().getResourceAsStream("inputData.properties");//new FileInputStream(workingDir + "\\src\\test\\resources\\inputData.properties");
-            InputStream validationFile = LanguageTestAutomate.class.getClassLoader().getResourceAsStream("validation.properties");
+            InputStream inputStream = LanguageTestAutomate.class.getClassLoader().getResourceAsStream("inputData.properties");//new FileInputStream(workingDir + "\\src\\test\\resources\\inputData.properties");
+            InputStreamReader isr = new InputStreamReader(inputStream, "UTF-8");
             properties = new Properties();
-            properties.load(inputFile);
+            properties.load(isr);
             String languageStr = properties.getProperty("language");
             languageInput = Splitter.on(";").trimResults().splitToList(languageStr);
+            InputStream validationStream = LanguageTestAutomate.class.getClassLoader().getResourceAsStream("validation.properties");
+            InputStreamReader vsr = new InputStreamReader(validationStream, "UTF-8");
             properties = new Properties();
-            properties.load(validationFile);
+            properties.load(vsr);
             String unrecognizedStr = properties.getProperty("unrecognized");
             unrecValidation = Splitter.on(";").trimResults().splitToList(unrecognizedStr);
         } catch (IOException e) {

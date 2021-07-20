@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
-
 import org.languagetool.JLanguageTool;
 import org.languagetool.language.AmericanEnglish;
 import org.languagetool.rules.RuleMatch;
@@ -27,11 +26,13 @@ public class LanguageTestAutomate {
 
     public static URL url;
     public static DesiredCapabilities capabilities;
-    public static AndroidDriver<AndroidElement> driver;
+    public static AndroidDriver<MobileElement> driver;
 
     Properties properties;
     List<String> languageInput;
-    List<String> unrecValidation;
+    List<String> unrecognizedLi;
+    List<String> subjectKeywordLi;
+    Integer passCount;
 
     public void readPropertyFile() {
 
@@ -46,16 +47,18 @@ public class LanguageTestAutomate {
             InputStreamReader vsr = new InputStreamReader(validationStream, "UTF-8");
             properties = new Properties();
             properties.load(vsr);
-            String unrecognizedStr = properties.getProperty("unrecognized");
-            unrecValidation = Splitter.on(";").trimResults().splitToList(unrecognizedStr);
+            String unrecognizedStr = properties.getProperty("unrecognized_keywords");
+            unrecognizedLi = Splitter.on(";").trimResults().splitToList(unrecognizedStr);
+            String subjectStr = properties.getProperty("subject_keywords");
+            subjectKeywordLi = Splitter.on(";").trimResults().splitToList(subjectStr);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public Boolean grammarChecker(List<String> check) throws IOException{
+    public Boolean grammarChecker(List<String> check) throws IOException {
         JLanguageTool langTool = new JLanguageTool(new AmericanEnglish());
-        for(int i=0; i< check.size();i++){
+        for(int i = 0 ; i < check.size() ; i++) {
             List<RuleMatch> matches = langTool.check(check.get(i));
             if (matches.size()>0) {
                 return FALSE;
@@ -64,13 +67,13 @@ public class LanguageTestAutomate {
         return TRUE;
     }
 
-
     @BeforeSuite
     public void setupAppium() throws MalformedURLException, IOException {
 
         readPropertyFile();
 //        System.out.println(languageInput);
-//        System.out.println(unrecValidation);
+        System.out.println(unrecognizedLi);
+        System.out.println(unrecognizedLi.contains("I get that... what else? "));
 
         final String URL_STRING = "http://0.0.0.0:4723/wd/hub/";
         url = new URL(URL_STRING);
@@ -78,7 +81,7 @@ public class LanguageTestAutomate {
         capabilities.setCapability(MobileCapabilityType.DEVICE_NAME, "emulator-5554");
         capabilities.setCapability("platformName", "android");
         capabilities.setCapability(MobileCapabilityType.NO_RESET, true);
-        driver = new AndroidDriver<AndroidElement>(url, capabilities);
+        driver = new AndroidDriver<MobileElement>(url, capabilities);
         driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 
 //        MobileElement el1 = (MobileElement) driver.findElementByAccessibilityId("Wysa");
@@ -88,15 +91,12 @@ public class LanguageTestAutomate {
 //        el21.click();
     }
 
-    //@Test(enabled = true)
+    @Test(enabled = true)
     public void myFirstTest() throws InterruptedException, IOException {
 
         for (int i = 0 ; i < languageInput.size() ; i++) {
-
             int caseID = i+1;
-            int passed = 0;
-            List<String> outputData = new ArrayList<>();
-
+            List<String> outputData = new ArrayList<>();;
             driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
             MobileElement el2 = (MobileElement) driver.findElementByXPath("//android.widget.LinearLayout[@content-desc=\"Talk\"]/android.widget.ImageView");
             el2.click();
@@ -106,8 +106,7 @@ public class LanguageTestAutomate {
             MobileElement el4 = (MobileElement) driver.findElementByAccessibilityId("Send");
             el4.click();
             TimeUnit.SECONDS.sleep(17);
-            List<AndroidElement> text1 = driver.findElements(By.className("android.widget.TextView"));
-
+            List<MobileElement> text1 = driver.findElements(By.className("android.widget.TextView"));
             for(MobileElement ele : text1) {
                 outputData.add(ele.getText());
             }
@@ -115,39 +114,31 @@ public class LanguageTestAutomate {
             outputData.remove(0);
             outputData.remove(0);
 
-            System.out.println("Testing Case "+ caseID+".1");
+            boolean acknowledgeFlag = true;
+            boolean grammarFlag = false;
+            boolean passFlag = false;
+
+            System.out.println("Test case " + caseID+".1");
+            System.out.println("Input : " + languageInput.get(i));
             System.out.println(outputData);
+            //Identified One of unrecognized keywords
+            if(unrecognizedLi.contains(outputData.get(0).trim())) {
+                acknowledgeFlag = false;
+                System.out.println(caseID+".1 " + "acknowledge failed");
+            }
+            if(grammarChecker(outputData)) {
+                grammarFlag = true;
+                System.out.println(caseID+".1 " + "grammar passed");
+            }
+            boolean subjectFlag = subjectKeywordLi.stream().anyMatch(str -> outputData.get(0).toLowerCase().contains(str.toLowerCase()));
 
-            if(unrecValidation.contains(outputData.get(0))){
-                System.out.println("Acknowledge Problem: Failed");
-            }
-            else{
-                System.out.println("Acknowledge Problem: Passed");
-                passed += 1;
-            }
+            System.out.println(caseID+".1 " + "subject " +subjectFlag);
 
-            if (grammarChecker(outputData)){
-                System.out.println("Grammar and Semantics: Passed");
-                passed += 1;
+            if(acknowledgeFlag && grammarFlag && subjectFlag) {
+                System.out.println("Status : Pass");
+            } else {
+                System.out.println("Status : Failed");
             }
-            else{
-                System.out.println("Grammar and Semantics: Failed");
-            }
-
-//            if (keyword){
-//                System.out.println("Subject Recognized: Passed");
-//                passed+=1;
-//            }
-//            else{
-//                System.out.println("Subject Recognized: Failed");
-//            }
-//
-//            if (passed==3){
-//                System.out.println("Test Case "+ caseID+".1: Passed");
-//            }
-//            else{
-//                System.out.println("Test Case "+ caseID+".1: Failed");
-//            }
 
             driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
             MobileElement el6 = (MobileElement) driver.findElementByAccessibilityId("Back button");

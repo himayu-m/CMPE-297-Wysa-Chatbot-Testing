@@ -210,7 +210,7 @@ public class DomainTestAutomate {
             System.out.println("Input: "+domainInput.get(i));
             System.out.println("Output: "+outputData);
 
-            if(unrecValidation.contains(outputData.get(0))){
+            if(unrecValidation.contains(outputData.get(0).trim())){
                 System.out.println("Acknowledge Problem: Failed");
             }
             else{

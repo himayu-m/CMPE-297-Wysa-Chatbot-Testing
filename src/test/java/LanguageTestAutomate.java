@@ -1,10 +1,11 @@
 import com.google.common.base.Splitter;
 import io.appium.java_client.MobileElement;
 import io.appium.java_client.android.AndroidDriver;
-import io.appium.java_client.android.AndroidElement;
 import io.appium.java_client.remote.MobileCapabilityType;
 import org.openqa.selenium.By;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 import java.io.IOException;
@@ -32,7 +33,7 @@ public class LanguageTestAutomate {
     List<String> languageInput;
     List<String> unrecognizedLi;
     List<String> subjectKeywordLi;
-    Integer passCount;
+    Integer failCount = 0;
 
     public void readPropertyFile() {
 
@@ -47,7 +48,7 @@ public class LanguageTestAutomate {
             InputStreamReader vsr = new InputStreamReader(validationStream, "UTF-8");
             properties = new Properties();
             properties.load(vsr);
-            String unrecognizedStr = properties.getProperty("unrecognized_keywords");
+            String unrecognizedStr = properties.getProperty("unrecognized");
             unrecognizedLi = Splitter.on(";").trimResults().splitToList(unrecognizedStr);
             String subjectStr = properties.getProperty("subject_keywords");
             subjectKeywordLi = Splitter.on(";").trimResults().splitToList(subjectStr);
@@ -58,9 +59,14 @@ public class LanguageTestAutomate {
 
     public Boolean grammarChecker(List<String> check) throws IOException {
         JLanguageTool langTool = new JLanguageTool(new AmericanEnglish());
+
         for(int i = 0 ; i < check.size() ; i++) {
             List<RuleMatch> matches = langTool.check(check.get(i));
             if (matches.size()>0) {
+                if(matches.toString().contains("Possible spelling mistake found") || matches.toString().contains("EXTREME_ADJECTIVES") ||
+                        matches.toString().contains("SOME_OF_THE") || matches.toString().contains("DAY_TO_DAY_HYPHEN")) {
+                    return TRUE;
+                }
                 return FALSE;
             }
         }
@@ -71,9 +77,6 @@ public class LanguageTestAutomate {
     public void setupAppium() throws MalformedURLException, IOException {
 
         readPropertyFile();
-//        System.out.println(languageInput);
-        System.out.println(unrecognizedLi);
-        System.out.println(unrecognizedLi.contains("I get that... what else? "));
 
         final String URL_STRING = "http://0.0.0.0:4723/wd/hub/";
         url = new URL(URL_STRING);
@@ -94,10 +97,11 @@ public class LanguageTestAutomate {
     @Test(enabled = true)
     public void myFirstTest() throws InterruptedException, IOException {
 
+        WebDriverWait wait = new WebDriverWait(driver, 120);
         for (int i = 0 ; i < languageInput.size() ; i++) {
             int caseID = i+1;
-            List<String> outputData = new ArrayList<>();;
-            driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+            List<String> outputData = new ArrayList<>();
+            MobileElement elem = (MobileElement) wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//android.widget.LinearLayout[@content-desc=\"Talk\"]/android.widget.ImageView")));
             MobileElement el2 = (MobileElement) driver.findElementByXPath("//android.widget.LinearLayout[@content-desc=\"Talk\"]/android.widget.ImageView");
             el2.click();
             driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
@@ -116,34 +120,34 @@ public class LanguageTestAutomate {
 
             boolean acknowledgeFlag = true;
             boolean grammarFlag = false;
-            boolean passFlag = false;
 
             System.out.println("Test case " + caseID+".1");
             System.out.println("Input : " + languageInput.get(i));
-            System.out.println(outputData);
+            System.out.println("Output : " + outputData);
             //Identified One of unrecognized keywords
             if(unrecognizedLi.contains(outputData.get(0).trim())) {
                 acknowledgeFlag = false;
-                System.out.println(caseID+".1 " + "acknowledge failed");
             }
+            System.out.println("Acknowledgement : "+acknowledgeFlag);
             if(grammarChecker(outputData)) {
                 grammarFlag = true;
-                System.out.println(caseID+".1 " + "grammar passed");
             }
-            boolean subjectFlag = subjectKeywordLi.stream().anyMatch(str -> outputData.get(0).toLowerCase().contains(str.toLowerCase()));
+            System.out.println("Grammar : "+grammarFlag);
 
-            System.out.println(caseID+".1 " + "subject " +subjectFlag);
+            boolean subjectFlag = subjectKeywordLi.stream().anyMatch(str -> outputData.get(0).toLowerCase().contains(str.toLowerCase()));
+            System.out.println("Subject : " +subjectFlag);
 
             if(acknowledgeFlag && grammarFlag && subjectFlag) {
-                System.out.println("Status : Pass");
+                System.out.println(caseID+".1 Status : Pass");
             } else {
-                System.out.println("Status : Failed");
+                failCount++;
+                System.out.println(caseID+".1 Status : Fail");
             }
-
             driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
             MobileElement el6 = (MobileElement) driver.findElementByAccessibilityId("Back button");
             el6.click();
             driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
         }
+        System.out.println("Total no of test cases that failed : " +failCount);
     }
 }

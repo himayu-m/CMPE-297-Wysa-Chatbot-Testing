@@ -56,7 +56,7 @@ public class DomainTestAutomate {
             InputStreamReader vsr = new InputStreamReader(validationStream, "UTF-8");
             properties = new Properties();
             properties.load(vsr);
-            String unrecognizedStr = properties.getProperty("unrecognized");
+            String unrecognizedStr = properties.getProperty("unrecognized_keywords");
             unrecValidation = Splitter.on(";").trimResults().splitToList(unrecognizedStr);
             String anxietyStr = properties.getProperty("domain_anxiety");
             domainAnxiety = Splitter.on(";").trimResults().splitToList(anxietyStr);
@@ -87,19 +87,9 @@ public class DomainTestAutomate {
         return TRUE;
     }
 
-    public Boolean subjectChecker(List<String> check, int testID){
-        List<String> subject;
-        if (testID >=13 && testID <=24){
-            subject = domainStress;
-        }
-        else if (testID >=25 && testID <=36){
-            subject = domainDepression;
-        }
-        else{
-            subject = domainAnxiety;
-        }
-        for(int i=0; i< subject.size();i++){
-            String phrase = subject.get(i);
+    public Boolean keywordChecker(List<String> check, List<String> validation){
+        for(int i=0; i< validation.size();i++){
+            String phrase = validation.get(i);
             for(int j=0; j< check.size();j++){
                 String test = check.get(j);
                 if (test.contains(phrase)){
@@ -109,54 +99,11 @@ public class DomainTestAutomate {
         }
         return FALSE;
     }
-
-    public Boolean adviceChecker(List<String> check){
-        for(int i=0; i< domainAdvice.size();i++){
-            String phrase = domainAdvice.get(i);
-            for(int j=0; j< check.size();j++){
-                String test = check.get(j);
-                if (test.contains(phrase)){
-                    return TRUE;
-                }
-            }
-        }
-        return FALSE;
-    }
-
-    public Boolean conceptChecker(List<String> check){
-        for(int i=0; i< domainConcept.size();i++){
-            String phrase = domainConcept.get(i);
-            for(int j=0; j< check.size();j++){
-                String test = check.get(j);
-                if (test.contains(phrase)){
-                    return TRUE;
-                }
-            }
-        }
-        return FALSE;
-    }
-
-    public Boolean furtherChecker(List<String> check){
-        for(int i=0; i< domainFurther.size();i++){
-            String phrase = domainFurther.get(i);
-            for(int j=0; j< check.size();j++){
-                String test = check.get(j);
-                if (test.contains(phrase)){
-                    return TRUE;
-                }
-            }
-        }
-        return FALSE;
-    }
-
-
 
     @BeforeSuite
     public void setupAppium() throws MalformedURLException {
 
         readPropertyFile();
-        //System.out.println(domainInput);
-        //System.out.println(unrecValidation);
 
         final String URL_STRING = "http://0.0.0.0:4723/wd/hub/";
         url = new URL(URL_STRING);
@@ -218,15 +165,18 @@ public class DomainTestAutomate {
                 passed += 1;
             }
 
-//            if (grammarChecker(outputData)){
-//                System.out.println("Grammar and Semantics: Passed");
-//                passed += 1;
-//            }
-//            else{
-//                System.out.println("Grammar and Semantics: Failed");
-//            }
+            List<String> subject;
+            if (caseID >=13 && caseID <=24){
+                subject = domainStress;
+            }
+            else if (caseID >=25 && caseID <=36){
+                subject = domainDepression;
+            }
+            else{
+                subject = domainAnxiety;
+            }
 
-            if (subjectChecker(outputData, i+1)){
+            if (keywordChecker(outputData, subject)){
                 System.out.println("Subject Recognized: Passed");
                 passed+=1;
             }
@@ -234,9 +184,8 @@ public class DomainTestAutomate {
                 System.out.println("Subject Recognized: Failed");
             }
 
-             if (adviceList.contains(i+1)){
-                 Boolean result1 = adviceChecker(outputData);
-                 if (result1.equals(TRUE)){
+            if (adviceList.contains(caseID)){
+                 if (keywordChecker(outputData, domainAdvice)){
                      System.out.println("Provides Advice: Passed");
                      passed +=1;
                  }
@@ -244,9 +193,8 @@ public class DomainTestAutomate {
                      System.out.println("Provides Advice: Failed");
                  }
              }
-             else if(conceptList.contains(i+1)){
-                 Boolean result2 = conceptChecker(outputData);
-                 if (result2.equals(TRUE)){
+             else if(conceptList.contains(caseID)){
+                 if (keywordChecker(outputData, domainConcept)){
                      System.out.println("Explains Concept: Passed");
                      passed +=1;
                  }
@@ -255,8 +203,7 @@ public class DomainTestAutomate {
                  }
              }
              else{
-                 Boolean result1 = furtherChecker(outputData);
-                 if (result1.equals(TRUE)){
+                 if (keywordChecker(outputData, domainFurther)){
                      System.out.println("Asks Further Questions: Passed");
                      passed +=1;
                  }
@@ -264,6 +211,14 @@ public class DomainTestAutomate {
                      System.out.println("Asks Further Questions: Failed");
                  }
              }
+
+//             if (grammarChecker(outputData)){
+//                System.out.println("Grammar and Semantics: Passed");
+//                passed += 1;
+//            }
+//            else{
+//                System.out.println("Grammar and Semantics: Failed");
+//            }
 
             if (passed==3){
                 System.out.println("Test Case DK "+ caseID+": PASSED"+"\n");
@@ -278,6 +233,6 @@ public class DomainTestAutomate {
             el6.click();
             driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
         }
-        System.out.println("Total test cases Passed"+totalPassed);
+        System.out.println("Total test cases Passed: "+totalPassed);
     }
 }

@@ -8,6 +8,8 @@ import org.languagetool.language.AmericanEnglish;
 import org.languagetool.rules.RuleMatch;
 import org.openqa.selenium.By;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
@@ -56,7 +58,7 @@ public class DomainTestAutomate {
             InputStreamReader vsr = new InputStreamReader(validationStream, "UTF-8");
             properties = new Properties();
             properties.load(vsr);
-            String unrecognizedStr = properties.getProperty("unrecognized_keywords");
+            String unrecognizedStr = properties.getProperty("unrecognized");
             unrecValidation = Splitter.on(";").trimResults().splitToList(unrecognizedStr);
             String anxietyStr = properties.getProperty("domain_anxiety");
             domainAnxiety = Splitter.on(";").trimResults().splitToList(anxietyStr);
@@ -125,6 +127,7 @@ public class DomainTestAutomate {
     public void myFirstTest() throws InterruptedException, IOException {
 
         int totalPassed = 0;
+        WebDriverWait wait = new WebDriverWait(driver, 120);
 
         for (int i = 0 ; i < domainInput.size() ; i++) {
 
@@ -135,7 +138,7 @@ public class DomainTestAutomate {
             List<Integer> adviceList = new ArrayList<>(Arrays.asList(1,2,11,12,13,14,23,24,25,26,35,36));
             List<Integer> conceptList = new ArrayList<>(Arrays.asList(3,4,5,15,16,17,27,28,29));
 
-            driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+            MobileElement elem = (MobileElement) wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//android.widget.LinearLayout[@content-desc=\"Talk\"]/android.widget.ImageView")));
             MobileElement el2 = (MobileElement) driver.findElementByXPath("//android.widget.LinearLayout[@content-desc=\"Talk\"]/android.widget.ImageView");
             el2.click();
             driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);

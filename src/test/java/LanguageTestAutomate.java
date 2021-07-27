@@ -138,10 +138,10 @@ public class LanguageTestAutomate {
             System.out.println("Subject Recognized : " +subjectFlag);
 
             if(acknowledgeFlag && grammarFlag && subjectFlag) {
-                System.out.println(caseID+".1 Status : Passed");
+                System.out.println(caseID+".1 Status : Passed \n");
             } else {
                 failCount++;
-                System.out.println(caseID+".1 Status : Failed");
+                System.out.println(caseID+".1 Status : Failed \n");
             }
             driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
             MobileElement el6 = (MobileElement) driver.findElementByAccessibilityId("Back button");

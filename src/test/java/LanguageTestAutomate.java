@@ -128,20 +128,20 @@ public class LanguageTestAutomate {
             if(unrecognizedLi.contains(outputData.get(0).trim())) {
                 acknowledgeFlag = false;
             }
-            System.out.println("Acknowledgement : "+acknowledgeFlag);
+            System.out.println("Acknowledges Problem : "+acknowledgeFlag);
             if(grammarChecker(outputData)) {
                 grammarFlag = true;
             }
-            System.out.println("Grammar : "+grammarFlag);
+            System.out.println("Grammar/Semantics Check : "+grammarFlag);
 
             boolean subjectFlag = subjectKeywordLi.stream().anyMatch(str -> outputData.get(0).toLowerCase().contains(str.toLowerCase()));
-            System.out.println("Subject : " +subjectFlag);
+            System.out.println("Subject Recognized : " +subjectFlag);
 
             if(acknowledgeFlag && grammarFlag && subjectFlag) {
-                System.out.println(caseID+".1 Status : Pass");
+                System.out.println(caseID+".1 Status : Passed");
             } else {
                 failCount++;
-                System.out.println(caseID+".1 Status : Fail");
+                System.out.println(caseID+".1 Status : Failed");
             }
             driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
             MobileElement el6 = (MobileElement) driver.findElementByAccessibilityId("Back button");

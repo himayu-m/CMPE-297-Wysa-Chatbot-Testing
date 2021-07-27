@@ -78,17 +78,6 @@ public class DomainTestAutomate {
         }
     }
 
-    public Boolean grammarChecker(List<String> check) throws IOException{
-        JLanguageTool langTool = new JLanguageTool(new AmericanEnglish());
-        for(int i=0; i< check.size();i++){
-            List<RuleMatch> matches = langTool.check(check.get(i));
-            if (matches.size()>0) {
-                return FALSE;
-            }
-        }
-        return TRUE;
-    }
-
     public Boolean keywordChecker(List<String> check, List<String> validation){
         for(int i=0; i< validation.size();i++){
             String phrase = validation.get(i);
@@ -116,11 +105,11 @@ public class DomainTestAutomate {
         driver = new AndroidDriver<AndroidElement>(url, capabilities);
         driver.manage().timeouts().implicitlyWait(2, TimeUnit.SECONDS);
 
-//        MobileElement el1 = (MobileElement) driver.findElementByAccessibilityId("Wysa");
-//        el1.click();
-//        driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
-//        MobileElement el21 = (MobileElement) driver.findElementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView[2]");
-//        el21.click();
+        MobileElement el1 = (MobileElement) driver.findElementByAccessibilityId("Wysa");
+        el1.click();
+        driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
+        MobileElement el21 = (MobileElement) driver.findElementByXPath("/hierarchy/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.view.ViewGroup/android.widget.TextView[2]");
+        el21.click();
     }
 
     @Test(enabled = true)
@@ -144,6 +133,8 @@ public class DomainTestAutomate {
             driver.manage().timeouts().implicitlyWait(30, TimeUnit.SECONDS);
             MobileElement el3 = (MobileElement) driver.findElementByAccessibilityId("Reply or say help…");
             el3.sendKeys(domainInput.get(i));
+            System.out.println("Testing Case DK "+ caseID);
+            System.out.println("Input: "+domainInput.get(i));
             MobileElement el4 = (MobileElement) driver.findElementByAccessibilityId("Send");
             el4.click();
             TimeUnit.SECONDS.sleep(17);
@@ -156,8 +147,7 @@ public class DomainTestAutomate {
             outputData.remove(0);
             outputData.remove(0);
 
-            System.out.println("Testing Case DK "+ caseID);
-            System.out.println("Input: "+domainInput.get(i));
+
             System.out.println("Output: "+outputData);
 
             if(unrecValidation.contains(outputData.get(0).trim())){
@@ -214,14 +204,6 @@ public class DomainTestAutomate {
                      System.out.println("Asks Further Questions: Failed");
                  }
              }
-
-//             if (grammarChecker(outputData)){
-//                System.out.println("Grammar and Semantics: Passed");
-//                passed += 1;
-//            }
-//            else{
-//                System.out.println("Grammar and Semantics: Failed");
-//            }
 
             if (passed==3){
                 System.out.println("Test Case DK "+ caseID+": PASSED"+"\n");
